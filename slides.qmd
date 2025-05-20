@@ -9,6 +9,10 @@ format:
         theme: simple
 ---
 
+## Follow along!
+
+[![This presentation is live on Github pages...](assets/qrcode-nhm-utt.png){width=30%}](https://connor-duffin.github.io/unit-testing-talk)
+
 ## Structure
 
 - What is unit testing?
