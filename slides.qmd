@@ -1,0 +1,138 @@
+---
+title: "NHM-R: Unit Testing Workshop"
+author:
+    name: Dr Connor Duffin
+    affiliation: Research Software Engineer, Biodiversity Futures Lab
+date: 2025-05-22
+format:
+    revealjs:
+        theme: simple
+---
+
+## Structure
+
+- What is unit testing?
+- Why do we do it in research?
+- Unit testing in R
+- Unit testing tips
+- Unit testing examples (toy package `{medfiltr}`)
+- Conclusions
+
+# Unit testing primer
+
+## What is unit testing?
+
+Abbreviated from [Wikipedia](https://en.wikipedia.org/wiki/Unit_testing):
+
+> Unit testing is a form of software testing by which **isolated source code is tested to validate expected behavior.** (...) Testing is often *performed by the programmer* who writes and modifies the code under test. Unit testing may be viewed as *part of the process of writing code.*
+
+Unit tests SHOULD BE QUICK TO RUN! Ideally, for a single test you want < 10s.
+
+## Unit testing in research {.smaller}
+
+- Research code is not production code.
+- The only standard abstractions are those we discover after trial-and-error...
+- Often we follow a pattern of:
+  - Create function to do specific task (e.g. process data, run `glm()`, etc)
+  - Test that specific code on the actual data (which may be slow)
+- Unit testing offers you a way of quickly testing the code.
+- This is **not for perfect correctness** but rather to make sure it is performing as we expect it to.
+- However: if you know the exact behaviour of a function then put it in!
+
+# Unit testing in R
+
+## Preface: Unit testing in R
+
+- In R we need to be working *within* a **package** in order to unit test our code.
+- However, the process of converting a collection of R functions into a package has never been easier:
+  - Packages `{devtools}` and `{usethis}` simplify the process of development.
+
+**If you can write a *function*, you can write a *package* (the rest is organization!).**
+
+## Unit testing in R
+
+- In R the standard package is `{testthat}`.
+- To run your tests you will usually need to be inside of a package, and will additionally need `{devtools}`.
+- Usually the layout of your package will look like this:
+
+```
+DESCRIPTION (file)
+NAMESPACE (file)
+R/ (directory)
+tests/ (directory)
+man/ (directory)
+vignettes/ (directory)
+data/ (directory)
+```
+
+## Aside - package structure 101 {.smaller}
+
+Let's disentangle the previous slide:
+
+- `DESCRIPTION` (file): metadata file describing our package.
+- `NAMESPACE` (file): which functions we want our users to have access to.
+- `R/` (directory): R functions.
+- `tests/` (directory): unit tests (!).
+- `man/` (directory): auto-generated documentation.
+- `vignettes/` (directory): authored long-form documentation/tutorials.
+- `data/` (directory): relevant datasets
+
+## Unit testing in R
+
+Within `tests` we have files that are used for testing. An example test file may look something like this:
+
+```{.r filename="test-arithmetic.R"}
+test_that("I can do arithmetic", {
+  expect_equal(1 + 1, 2)
+  expect_equal(2 * 2, 4)
+
+  mat <- matrix(runif(100), nrow = 10)
+  expect_true(min(mat) >= 0)
+  expect_true(max(mat) <= 1)
+})
+```
+
+We use the `expect_*` family of functions to define our tests. This layout is the **backbone of testing in R.**
+
+## Unit testing tips
+
+- If the code is nondeterministic, test for metadata (i.e. dimensions, dimension names, object attributes).
+- Refactor code to avoid duplication and repeated setup.
+- Aim for short tests that tests one thing only (general Unix philosophy).
+- Use known results if they are cheap and easy to compute.
+- You can do `expect_error`, `expect_warning` to check for runtime problems.
+
+# Unit testing example
+
+## Unit testing example
+
+- Now, I'll go through some unit testing examples.
+
+[![I'm going to use a toy package called `medfiltr` to demonstrate testing.](assets/medfiltr2.png)](https://github.com/connor-duffin/medfiltr)
+
+::: {.notes}
+- Show package structure in Rstudio.
+- `devtools::test()`, `devtools::test_active_file()`, `devtools::check()`.
+- Delete and remove old tests, to show process.
+- Maybe show the process of adding in new tests with the `test-arithmetic.R` file.
+- `devtools::test_coverage()` maybe?
+:::
+
+# Wrapping up
+
+## Recap
+
+- Unit tests are quick checks for expected function behaviour.
+- These are usually included in `R` packages with `{testthat}`.
+- Unit tests provide a way of checking that your code consistently runs.
+- They *can be* objective demonstrations of correctness of your code!
+- With a little organization they are easy to implement!
+
+## Useful links
+
+- [{`testthat`} R package.](https://testthat.r-lib.org/)
+- [{`devtools`} R package.](https://devtools.r-lib.org/)
+- [{`usethis`} R package.](https://usethis.r-lib.org/)
+- [R packages book by Hadley Wickham and Jennifer Bryan](https://r-pkgs.org/).
+
+Thanks for listening!
